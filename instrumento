@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FisioForça</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #e6f4ea; margin: 0; padding: 1rem; color: #084c41; }
+    h1 { text-align: center; color: #047857; }
+    form { display: flex; flex-direction: column; gap: 1rem; max-width: 400px; margin: 0 auto; }
+    label { display: flex; flex-direction: column; }
+    input[type="number"], input[type="text"] { padding: 0.5rem; border-radius: 5px; border: 1px solid #047857; }
+    button { background-color: #047857; color: white; border: none; padding: 0.5rem; border-radius: 5px; cursor: pointer; }
+    #historicoBtn, #ajudaBtn { position: fixed; top: 10px; padding: 0.5rem 1rem; }
+    #historicoBtn { right: 10px; }
+    #ajudaBtn { left: 10px; }
+    #historicoModal, #ajudaModal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+    #historicoContent, #ajudaContent { background: #fff; color: #000; padding: 1rem; max-width: 90%; max-height: 90vh; overflow-y: auto; border-radius: 10px; }
+    .nomeItem { cursor: pointer; color: #047857; margin: 0.5rem 0; }
+    .rodape { position: fixed; bottom: 10px; left: 10px; font-size: 12px; color: #047857; }
+    .emoji { font-size: 100px; opacity: 0.1; position: absolute; top: 10px; left: 10px; z-index: -1; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    table, th, td { border: 1px solid #ccc; }
+    th, td { padding: 0.5rem; text-align: left; }
+  </style>
+</head>
+<body>
+  <h1>FisioForça</h1>
+  <button id="ajudaBtn">Ajuda</button>
+  <button id="historicoBtn">Histórico</button>
+  <form id="formulario">
+    <label>Nome:<input type="text" id="nome" required></label>
+    <label>Patologia:<input type="text" id="patologia" required></label>
+    <label>1. Flexão de Braços com Peso:<input type="number" id="ex1" min="0" max="10" required></label>
+    <label>2. Abdução de Ombros com Peso:<input type="number" id="ex2" min="0" max="10" required></label>
+    <label>3. Elevação de Ombros com Peso:<input type="number" id="ex3" min="0" max="10" required></label>
+    <label>4. Elevação de Perna Sentado:<input type="number" id="ex4" min="0" max="10" required></label>
+    <label>5. Flexão de Tornozelo:<input type="number" id="ex5" min="0" max="10" required></label>
+    <label>6. Rotação de Tronco:<input type="number" id="ex6" min="0" max="10" required></label>
+    <button type="submit">Salvar</button>
+    <button type="button" id="mediaBtn">Ver Média</button>
+  </form>
+
+  <div id="historicoModal">
+    <div id="historicoContent">
+      <h2>Histórico de Participantes</h2>
+      <div id="nomesSalvos"></div>
+      <div id="detalhesPontuacao"></div>
+      <button id="limparHistoricoBtn">Limpar Histórico</button>
+    </div>
+  </div>
+
+  <div id="ajudaModal">
+    <div id="ajudaContent">
+      <h2>Instruções de Uso – Sistema FisioForça</h2>
+      <p>Este instrumento foi desenvolvido para ser aplicado em <strong>idosos com suspeita ou presença de perda de força muscular</strong>. Nele, é possível registrar o <strong>nome do paciente</strong>, sua <strong>patologia</strong> e as <strong>pontuações de seis exercícios funcionais</strong>, avaliados de 0 a 10.</p>
+      <h3>Sobre os Exercícios com Peso</h3>
+      <p>Os exercícios 1, 2 e 3 utilizam peso externo. No estudo original foi utilizado <strong>1 kg em cada membro</strong>, mas o peso pode ser ajustado conforme a capacidade do paciente, contanto que <strong>seja igual para os dois lados do corpo</strong>.</p>
+      <h3>Objetivo</h3>
+      <ul>
+        <li>Quantificar a força muscular funcional.</li>
+        <li>Avaliar e reavaliar a evolução após tratamento.</li>
+        <li>Valor de referência: o que o paciente conseguir realizar.</li>
+      </ul>
+      <h3>Pontuação (0 a 10)</h3>
+      <table>
+        <thead><tr><th>Pontuação</th><th>Descrição</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>Incapaz de iniciar o movimento, mesmo com assistência. Sem contração muscular visível.</td></tr>
+          <tr><td>1</td><td>Contração muscular visível, mas sem movimento. Precisa de assistência total.</td></tr>
+          <tr><td>2</td><td>Inicia o movimento, mas não completa. Grande dificuldade e assistência significativa.</td></tr>
+          <tr><td>3</td><td>Movimento incompleto, com compensações evidentes. Assistência parcial é necessária.</td></tr>
+          <tr><td>4</td><td>Movimento quase completo, mas lento e com compensações. Alguma ajuda é necessária.</td></tr>
+          <tr><td>5</td><td>Movimento completo, mas com lentidão ou leve compensação. Realiza sem ajuda.</td></tr>
+          <tr><td>6</td><td>Movimento completo com leve esforço. Pequena instabilidade ou fadiga perceptível.</td></tr>
+          <tr><td>7</td><td>Movimento completo, com controle razoável. Pequena oscilação, mas sem ajuda.</td></tr>
+          <tr><td>8</td><td>Movimento completo, bom controle e ritmo. Sem compensações, mas com esforço moderado.</td></tr>
+          <tr><td>9</td><td>Movimento completo, com controle, força adequada e execução estável. Esforço mínimo.</td></tr>
+          <tr><td>10</td><td>Execução perfeita: força, controle, estabilidade e ritmo ideais. Sem fadiga ou compensações.</td></tr>
+        </tbody>
+      </table>
+      <h3>Funcionalidades</h3>
+      <ul>
+        <li><strong>Histórico:</strong> clique no nome para ver os dados. Clique novamente para ocultar.</li>
+        <li><strong>Limpar Histórico:</strong> apaga todos os dados salvos.</li>
+        <li><strong>Ver Média:</strong> mostra a média de cada exercício com base nas respostas salvas.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="emoji">⚕</div>
+  <div class="rodape">Criador: Kamilly Rossi Bonatti</div>
+
+  <script>
+    const form = document.getElementById('formulario');
+    const historicoBtn = document.getElementById('historicoBtn');
+    const historicoModal = document.getElementById('historicoModal');
+    const nomesSalvos = document.getElementById('nomesSalvos');
+    const detalhesPontuacao = document.getElementById('detalhesPontuacao');
+    const limparHistoricoBtn = document.getElementById('limparHistoricoBtn');
+    const mediaBtn = document.getElementById('mediaBtn');
+    const ajudaBtn = document.getElementById('ajudaBtn');
+    const ajudaModal = document.getElementById('ajudaModal');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nome = document.getElementById('nome').value.trim();
+      const patologia = document.getElementById('patologia').value.trim();
+      const pontuacoes = {
+        ex1: +document.getElementById('ex1').value,
+        ex2: +document.getElementById('ex2').value,
+        ex3: +document.getElementById('ex3').value,
+        ex4: +document.getElementById('ex4').value,
+        ex5: +document.getElementById('ex5').value,
+        ex6: +document.getElementById('ex6').value,
+      };
+      if (!nome) return;
+      const dados = JSON.parse(localStorage.getItem('historicoMuscular') || '{}');
+      dados[nome] = { nome, patologia, pontuacoes };
+      localStorage.setItem('historicoMuscular', JSON.stringify(dados));
+      form.reset();
+      alert('Salvo com sucesso!');
+    });
+
+    historicoBtn.addEventListener('click', () => {
+      const dados = JSON.parse(localStorage.getItem('historicoMuscular') || '{}');
+      nomesSalvos.innerHTML = '';
+      detalhesPontuacao.innerHTML = '';
+      for (let nome in dados) {
+        const p = document.createElement('p');
+        p.className = 'nomeItem';
+        p.textContent = nome;
+        p.onclick = () => mostrarDetalhes(nome, dados[nome]);
+        nomesSalvos.appendChild(p);
+      }
+      historicoModal.style.display = 'flex';
+    });
+
+    limparHistoricoBtn.addEventListener('click', () => {
+      localStorage.removeItem('historicoMuscular');
+      alert('Histórico limpo!');
+      historicoModal.style.display = 'none';
+    });
+
+    mediaBtn.addEventListener('click', () => {
+      const dados = JSON.parse(localStorage.getItem('historicoMuscular') || '{}');
+      const medias = {
+        ex1: calcularMedia(dados, 'ex1'),
+        ex2: calcularMedia(dados, 'ex2'),
+        ex3: calcularMedia(dados, 'ex3'),
+        ex4: calcularMedia(dados, 'ex4'),
+        ex5: calcularMedia(dados, 'ex5'),
+        ex6: calcularMedia(dados, 'ex6'),
+      };
+      alert(`Média dos Exercícios:\n1: ${medias.ex1}\n2: ${medias.ex2}\n3: ${medias.ex3}\n4: ${medias.ex4}\n5: ${medias.ex5}\n6: ${medias.ex6}`);
+    });
+
+    ajudaBtn.addEventListener('click', () => {
+      ajudaModal.style.display = 'flex';
+    });
+
+    function calcularMedia(dados, exercicio) {
+      let soma = 0;
+      let count = 0;
+      for (let nome in dados) {
+        soma += dados[nome].pontuacoes[exercicio];
+        count++;
+      }
+      return count > 0 ? (soma / count).toFixed(2) : 'N/A';
+    }
+
+    function mostrarDetalhes(nome, dados) {
+      if (detalhesPontuacao.innerHTML.includes(nome)) {
+        detalhesPontuacao.innerHTML = '';
+        return;
+      }
+      detalhesPontuacao.innerHTML = `
+        <h3>${dados.nome} (${dados.patologia})</h3>
+        <ul>
+          <li>1. Flexão de Braços com Peso: ${dados.pontuacoes.ex1}</li>
+          <li>2. Abdução de Ombros com Peso: ${dados.pontuacoes.ex2}</li>
+          <li>3. Elevação de Ombros com Peso: ${dados.pontuacoes.ex3}</li>
+          <li>4. Elevação de Perna Sentado: ${dados.pontuacoes.ex4}</li>
+          <li>5. Flexão de Tornozelo: ${dados.pontuacoes.ex5}</li>
+          <li>6. Rotação de Tronco: ${dados.pontuacoes.ex6}</li>
+        </ul>`;
+    }
+
+    [historicoModal, ajudaModal].forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
+      });
+    });
+  </script>
+</body>
+</html>
